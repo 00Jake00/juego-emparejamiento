@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Empareja y Construye - Amor y Amistad</title>
+  <style>
+    :root{
+      --primary:#d63384;
+      --accent:#ffc0cb;
+      --ok:#2ecc71;
+      --card:#ffffff;
+      --bg:#fff0f5;
+      --shadow:0 8px 30px rgba(0,0,0,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; padding:16px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      background:var(--bg); color:#222;
+      display:flex; flex-direction:column; align-items:center; gap:16px;
+    }
+    header{max-width:960px; width:100%; text-align:center}
+    h1{margin:.25rem 0; color:var(--primary)}
+    p.sub{margin:0; opacity:.85}
+    .hud{ display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap }
+    .badge{ background:#fff; border:1px solid #eee; padding:8px 12px; border-radius:999px; box-shadow:var(--shadow) }
+    .board{
+      width:100%; max-width:960px; margin:0 auto;
+      display:grid; gap:10px;
+      grid-template-columns:repeat(auto-fit, minmax(90px,1fr));
+      perspective:1000px;
+    }
+    @media (min-width:480px){
+      .board{ gap:12px; grid-template-columns:repeat(auto-fit, minmax(100px,1fr)); }
+    }
+    @media (min-width:768px){
+      .board{ grid-template-columns:repeat(auto-fit, minmax(110px,1fr)); }
+    }
+    .card{
+      position:relative; width:100%; aspect-ratio:3/4;
+      border-radius:14px; cursor:pointer;
+      transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
+      transition:transform .55s ease; will-change:transform;
+      box-shadow:var(--shadow);
+      background:transparent; border:0; padding:0;
+      outline:none;
+    }
+    .card:focus-visible{ outline:3px solid #0004; outline-offset:2px }
+    .card.locked{ pointer-events:none }
+    .card.matched{ outline:3px solid var(--ok) }
+    .face{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      padding:10px; border-radius:14px;
+      backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    }
+    .front{ background:var(--card); border:1px solid #eee }
+    .back{
+      transform:rotateY(180deg) translateZ(0);
+      background:linear-gradient(160deg, var(--primary), #ff6fa3);
+      color:#fff; border:1px solid transparent
+    }
+    .card.flipped{ transform:rotateY(180deg) translateZ(0) }
+    .word, .def{
+      text-align:center;
+      overflow-wrap:anywhere; word-break:break-word; white-space:pre-line;
+    }
+    .word{ font-weight:800; font-size:clamp(.9rem, 1.2vw + .8rem, 1.25rem) }
+    .def{ font-size:clamp(.82rem, 1vw + .6rem, 1.05rem); line-height:1.2 }
+    .toolbar{ margin-top:4px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center }
+    button.action{
+      appearance:none; border:0; background:var(--primary); color:#fff;
+      padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer
+    }
+    button.action.alt{ background:#555 }
+    button.action:focus-visible{ outline:3px solid var(--accent); outline-offset:2px }
+    .toast{
+      position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+      background:#111; color:#fff; padding:10px 14px; border-radius:999px;
+      opacity:0; pointer-events:none; transition:opacity .25s ease
+    }
+    .toast.show{ opacity:.95 }
+    @media (prefers-reduced-motion: reduce){
+      .card{ transition:none }
+      .toast{ transition:none }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Empareja y Construye</h1>
+    <p class="sub">Encuentra las parejas: <strong>palabra</strong> + <strong>mensaje</strong> que construyen vínculos sanos.</p>
+  </header>
+  <div class="hud" role="status" aria-live="polite">
+    <span class="badge">Aciertos: <strong id="hits">0</strong>/<strong id="total">0</strong></span>
+    <span class="badge">Movimientos: <strong id="moves">0</strong></span>
+    <span class="badge">Tiempo: <strong id="time">00:00</strong></span>
+  </div>
+  <section class="board" id="board" aria-label="Tablero de cartas"></section>
+  <div class="toolbar">
+    <button id="btnReset" class="action" type="button">Reiniciar</button>
+    <button id="btnHelp" class="action alt" type="button">¿Cómo jugar?</button>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const ITEMS = [
+      { id:"CONVIVENCIA",       word:"CONVIVENCIA",         def:"La paz se construye con actos pequeños de cuidado." },
+      { id:"AMOR",              word:"AMOR",                def:"El amor crece cuando no duele ni impone." },
+      { id:"AMISTAD",           word:"AMISTAD",             def:"Se fortalece con respeto y escucha." },
+      { id:"CORRESPONSABILIDAD",word:"CORRESPONSA\nBILIDAD",def:"El cuidado nos corresponde a todas y todos." },
+      { id:"UNION",             word:"UNIÓN",               def:"Las diferencias se superan dialogando." },
+      { id:"RESPETO",           word:"RESPETO",             def:"Amar no es controlar: el buen trato es la base." },
+      { id:"SOLIDARIDAD",       word:"SOLIDARIDAD",         def:"Ayudar nos vuelve más fuertes como comunidad." },
+      { id:"ALEGRIA",           word:"ALEGRÍA",             def:"Celebremos sin insultos ni agresiones." },
+      { id:"EMOCION",           word:"EMOCIÓN",             def:"Hablar de lo que sentimos fortalece los vínculos." },
+      { id:"EMPATIA",           word:"EMPATÍA",             def:"Ponerse en los zapatos del otro cambia conversaciones." },
+      { id:"AUTORREGULACION",   word:"AUTORREGULACIÓN",     def:"Sentir rabia es humano; actuar con respeto es decisión." }
+    ];
+    const MOBILE_BREAKPOINT = 520;
+    const MOBILE_PAIRS = 6;
+    const $  = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => [...ctx.querySelectorAll(sel)];
+    const toast = (msg, t=1600) => {
+      const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'), t);
+    };
+    const fmt = t => `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+    let seconds=0, timer=null;
+    function startTimer(){ if(timer) return; timer = setInterval(()=>{ seconds++; $('#time').textContent = fmt(seconds); },1000); }
+    function resetTimer(){ clearInterval(timer); timer=null; seconds=0; $('#time').textContent=fmt(0); }
+    function pickActiveItems(){
+      const isMobile = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
+      if(!isMobile) return ITEMS;
+      const pool = [...ITEMS];
+      const chosen = [];
+      while(chosen.length < Math.min(MOBILE_PAIRS, pool.length)){
+        const i = Math.floor(Math.random()*pool.length);
+        chosen.push(pool.splice(i,1)[0]);
+      }
+      return chosen;
+    }
+    function buildDeck(items){
+      const deck=[];
+      for(const it of items){
+        deck.push({pair:it.id, type:'word', content:it.word});
+        deck.push({pair:it.id, type:'def',  content:it.def});
+      }
+      return deck.sort(()=>Math.random()-0.5);
+    }
+    const board = $('#board');
+    let DECK_ITEMS = pickActiveItems();
+    let deck=[], open=[], locked=false, hits=0, moves=0;
+    function render(){
+      board.innerHTML='';
+      deck.forEach((card, idx)=>{
+        const el = document.createElement('button');
+        el.className = 'card';
+        el.type = 'button';
+        el.setAttribute('aria-label','Carta oculta');
+        el.setAttribute('tabindex','0');
+        el.dataset.index = idx;
+        el.innerHTML = `
+          <div class="face front" aria-hidden="true"></div>
+          <div class="face back">
+            ${card.type==='word' ? `<div class="word">${card.content}</div>` : `<div class="def">${card.content}</div>`}
+          </div>`;
+        el.addEventListener('click', ()=> flip(el));
+        el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flip(el); } });
+        board.appendChild(el);
+      });
+      $('#total').textContent = DECK_ITEMS.length;
+      $('#hits').textContent  = hits;
+      $('#moves').textContent = moves;
+    }
+    function flip(el){
+      if(locked) return;
+      if(el.classList.contains('flipped') || el.classList.contains('matched')) return;
+      startTimer();
+      el.classList.add('flipped');
+      open.push({ idx:+el.dataset.index, el, card: deck[+el.dataset.index] });
+      if(open.length === 2){
+        moves++; $('#moves').textContent = moves; locked = true;
+        const [a,b] = open;
+        const isPair = a.card.pair === b.card.pair && a.card.type !== b.card.type;
+        setTimeout(()=>{
+          if(isPair){
+            a.el.classList.add('matched','locked');
+            b.el.classList.add('matched','locked');
+            hits++; $('#hits').textContent = hits;
+            const item = DECK_ITEMS.find(i => i.id === a.card.pair) || DECK_ITEMS.find(i => i.id === b.card.pair);
+            if(item) toast(`${(item.word || '').replace(/\n/g,'')}: ¡bien emparejado!`);
+            if(hits === DECK_ITEMS.length){
+              resetTimer();
+              setTimeout(()=> toast('¡Completaste todos los pares!'), 350);
+            }
+          } else {
+            a.el.classList.remove('flipped');
+            b.el.classList.remove('flipped');
+          }
+          open=[]; locked=false;
+        }, 650);
+      }
+    }
+    function reset(){
+      hits=0; moves=0; open=[]; locked=false; resetTimer();
+      DECK_ITEMS = pickActiveItems();
+      deck = buildDeck(DECK_ITEMS);
+      render();
+    }
+    $('#btnReset').addEventListener('click', reset);
+    $('#btnHelp').addEventListener('click', ()=> toast('Empareja cada palabra con su mensaje.'));
+    reset();
+  </script>
+</body>
+</html>
