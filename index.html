@@ -16,13 +16,20 @@
       color:#222;
     }
 
-    /* Fondo limpio */
+    /* Fondo limpio con raw.githubusercontent.com */
     body::before{
       content:"";
       position:fixed; inset:0; z-index:-1;
       background:
         url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%C3%B1a%20Amor%20y%20Amistad_FondoJuegos_Fondo-H.jpg")
         center / cover no-repeat;
+    }
+    @media (max-width:575.98px){
+      body::before{
+        background:
+          url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%C3%B1a%20Amor%20y%20Amistad_FondoJuegos_Fondo-V.jpg")
+          center / cover no-repeat;
+      }
     }
 
     /* Header con logos */
@@ -81,7 +88,20 @@
       border-radius:14px; backface-visibility:hidden;
       padding:10px;
     }
-    .front{ background:#fff; border:1px solid #eee }
+
+    /* Espalda de las cartas */
+    .front{
+      background:url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%C3%B1a%20Amor%20y%20Amistad_FondoJuegos_Carta-300x400.jpg")
+                center/cover no-repeat;
+      border:1px solid #eee;
+    }
+    @media(max-width:575.98px){
+      .front{
+        background:url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%C3%B1a%20Amor%20y%20Amistad_FondoJuegos_Carta-110x140.jpg")
+                  center/cover no-repeat;
+      }
+    }
+
     .back{ transform:rotateY(180deg); background:#fff; border:1px solid #eee; color:#222 }
 
     .word{ font-weight:800; font-size:clamp(.9rem,1.2vw + .8rem,1.25rem); text-align:center }
