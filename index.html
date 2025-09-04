@@ -10,7 +10,7 @@
 
   <style>
     :root{
-      --primary:#d63384; /* magenta para título y botones */
+      --primary:#d63384; /* magenta */
       --accent:#ffc0cb;
       --ok:#2ecc71;
       --shadow:0 8px 30px rgba(0,0,0,.08);
@@ -45,32 +45,38 @@
 
     /* Logos en esquinas */
     .logo-corner{
-      position:fixed; top:12px; z-index:10; width:auto; height:50px;
+      position:fixed; top:12px; z-index:10;
       display:block; background-size:contain; background-repeat:no-repeat; background-position:center;
       filter: drop-shadow(0 2px 6px rgba(0,0,0,.2));
     }
-    .logo-left{ left:12px; background-image: var(--logo-izq); aspect-ratio:1/1; width:50px; height:50px; }
-    .logo-right{ right:12px; background-image: var(--logo-der); aspect-ratio:1/1; width:60px; height:50px; }
+    /* Desktop: logos más grandes */
+    .logo-left{  left:12px;  background-image: var(--logo-izq); width:72px; height:72px; }
+    .logo-right{ right:12px; background-image: var(--logo-der); width:86px; height:72px; }
 
+    /* Móvil: más pequeños y bajamos el header para no chocar */
     @media (max-width:575.98px){
-      .logo-left{ left:8px; width:42px; height:42px; top:8px; }
-      .logo-right{ right:8px; width:50px; height:42px; top:8px; }
+      .logo-left{  left:8px;  width:46px; height:46px; top:8px; }
+      .logo-right{ right:8px; width:56px; height:46px; top:8px; }
     }
 
     header{
       max-width:1100px; width:100%; text-align:center;
-      /* sin sombra de texto */
     }
     h1{
       margin:.25rem 0;
-      color:var(--primary);                 /* magenta */
+      color:var(--primary);
       font-weight:700;
-      font-size:clamp(24px, 6vw, 40px);     /* un poco más grande en desktop */
+      font-size:clamp(24px, 6vw, 40px);
       letter-spacing:.2px;
     }
+    /* Empujar un poco el header en móvil para que no tape los logos */
+    @media (max-width:575.98px){
+      header{ margin-top:58px; }
+    }
+
     p.sub{
       margin:0;
-      color:#000;                           /* frase en negro */
+      color:#000;
       font-size:clamp(14px, 3.6vw, 18px);
       font-weight:600;
     }
@@ -135,13 +141,24 @@
     }
     .card.flipped{ transform:rotateY(180deg) translateZ(0) }
 
-    /* Texto dentro de las cartas (ajustado para desktop y móvil) */
+    /* Texto de las cartas */
     .word, .def{
       text-align:center; overflow-wrap:anywhere; word-break:break-word; white-space:pre-line;
       font-family:'Comfortaa', system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
-    .word{ font-weight:800; font-size: clamp(.9rem, .5vw + .75rem, 1.05rem); line-height:1.1; hyphens:auto; -webkit-hyphens:auto; }
-    .def { font-weight:600; font-size: clamp(.82rem, .4vw + .65rem, .98rem); line-height:1.15; hyphens:auto; -webkit-hyphens:auto; }
+    /* Concepto en magenta */
+    .word{
+      color:var(--primary);
+      font-weight:800;
+      font-size: clamp(.9rem, .5vw + .75rem, 1.05rem);
+      line-height:1.1; hyphens:auto; -webkit-hyphens:auto;
+    }
+    .def{
+      color:#222;
+      font-weight:600;
+      font-size: clamp(.82rem, .4vw + .65rem, .98rem);
+      line-height:1.15; hyphens:auto; -webkit-hyphens:auto;
+    }
 
     .toolbar{
       width:100%; max-width:1100px; margin-top:6px;
@@ -193,7 +210,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    // ===== Datos (11 pares) =====
     const ITEMS = [
       { id:"CONVIVENCIA",       word:"CONVIVENCIA",         def:"La paz se construye con actos pequeños de cuidado." },
       { id:"AMOR",              word:"AMOR",                def:"El amor crece cuando no duele ni impone." },
@@ -208,7 +224,6 @@
       { id:"AUTORREGULACION",   word:"AUTORREGULACIÓN",     def:"Sentir rabia es humano; actuar con respeto es decisión." }
     ];
 
-    // Parámetros mobile
     const MOBILE_BREAKPOINT = 520;  // px
     const MOBILE_PAIRS      = 6;    // parejas en móvil
 
@@ -224,7 +239,6 @@
 
     function toast(msg, t=1600){ toastEl.textContent = msg; toastEl.classList.add('show'); setTimeout(()=>toastEl.classList.remove('show'), t); }
 
-    // Elegir items según viewport
     function pickActiveItems(){
       const isMobile = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches;
       if(!isMobile) return ITEMS;
