@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Empareja y Construye - Amor y Amistad</title>
 
-  <!-- Comfortaa -->
+  <!-- Comfortaa en TODO -->
   <link href="https://fonts.cdnfonts.com/css/comfortaa" rel="stylesheet">
 
   <style>
@@ -21,8 +21,7 @@
       font-family:'Comfortaa','Segoe UI',system-ui,Roboto,Arial,sans-serif;
       color:#222;
       display:flex; flex-direction:column; align-items:center;
-      padding:20px; gap:14px;
-      min-height:100vh;
+      padding:20px; gap:14px; min-height:100vh;
     }
 
     /* ===== Fondo a pantalla completa (PC / Móvil) ===== */
@@ -30,40 +29,33 @@
       content:"";
       position:fixed; inset:0; z-index:-1;
       background:
-        url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%CC%83a%20Amor%20y%20Amistad_FondoJuegos_Fondo-H.jpg")
+        url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%CC%83a%20Amor%20y%20Amistad_FondoJuegos_Fondo-H.jpg?v=4")
         center/cover no-repeat;
       background-color:#fdebf3; /* fallback mientras carga */
     }
     @media (max-width:575.98px){
       body::before{
         background:
-          url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%CC%83a%20Amor%20y%20Amistad_FondoJuegos_Fondo-V.jpg")
+          url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%CC%83a%20Amor%20y%20Amistad_FondoJuegos_Fondo-V.jpg?v=4")
           center/cover no-repeat;
       }
     }
 
-    /* ===== Logos superiores opcionales ===== */
-    .topbar{
-      width:100%; max-width:1200px;
-      display:flex; justify-content:space-between; align-items:center;
-    }
+    /* ===== Encabezado y logos (opcionales) ===== */
+    .topbar{width:100%; max-width:1200px; display:flex; justify-content:space-between; align-items:center}
     .topbar img{ height:60px; width:auto }
     @media(max-width:600px){ .topbar img{ height:40px } }
 
-    /* ===== Encabezado ===== */
     header{max-width:960px; text-align:center}
     header h1{color:var(--primary); margin:.25rem 0}
-    header .sub{color:#111; font-weight:600;}
+    header .sub{color:#111; font-weight:600;} /* NEGRO como pediste */
 
     /* ===== HUD ===== */
-    .hud{
-      display:flex; gap:12px; flex-wrap:wrap; justify-content:center;
-    }
+    .hud{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center }
     .badge{
       background:rgba(17,17,17,.9); color:#fff;
       border:1px solid rgba(255,255,255,.2);
-      padding:8px 12px; border-radius:999px;
-      box-shadow:var(--shadow);
+      padding:8px 12px; border-radius:999px; box-shadow:var(--shadow);
     }
 
     /* ===== Tablero ===== */
@@ -87,6 +79,7 @@
       transform-style:preserve-3d; transition:transform .55s ease;
       box-shadow:var(--shadow);
       background:transparent; border:0; padding:0; outline:none;
+      font-family:'Comfortaa','Segoe UI',system-ui,Roboto,Arial,sans-serif; /* asegura fuente en cartas */
     }
     .card:focus-visible{ outline:3px solid #0004; outline-offset:2px }
     .card.flipped{ transform:rotateY(180deg) }
@@ -98,17 +91,17 @@
       border-radius:14px; backface-visibility:hidden; padding:10px;
     }
 
-    /* Dorso (boca abajo) — PC y Móvil con textura distinta */
+    /* Dorso (boca abajo) — PC / Móvil con imagen distinta */
     .front{
       background:
-        url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%CC%83a%20Amor%20y%20Amistad_FondoJuegos_Carta-300x400.jpg")
+        url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%CC%83a%20Amor%20y%20Amistad_FondoJuegos_Carta-300x400.jpg?v=4")
         center/cover no-repeat;
       border:1px solid #eee;
     }
     @media(max-width:575.98px){
       .front{
         background:
-          url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%CC%83a%20Amor%20y%20Amistad_FondoJuegos_Carta-110x140.jpg")
+          url("https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/DPCC_Campa%CC%83a%20Amor%20y%20Amistad_FondoJuegos_Carta-110x140.jpg?v=4")
           center/cover no-repeat;
       }
     }
@@ -154,7 +147,7 @@
   </style>
 </head>
 <body>
-  <!-- Logos (opcional) -->
+  <!-- Logos (si quieres mostrarlos arriba; puedes quitarlos) -->
   <div class="topbar">
     <img src="https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/LOGO.png" alt="Dirección de Prevención">
     <img src="https://raw.githubusercontent.com/00Jake00/juego-emparejamiento/main/BTA.png" alt="Alcaldía de Bogotá">
@@ -309,4 +302,3 @@
   </script>
 </body>
 </html>
-
